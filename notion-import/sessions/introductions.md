@@ -14,11 +14,11 @@ Ce document contient les introductions narratives lues au début de chaque sessi
 
 …Bon, sauf toi, bien sûr.
 
-*(il regarde la joueuse sans lore avec un sourire)*
+_(il regarde la joueuse sans lore avec un sourire)_
 
 Toi, tu es un mystère. Même à toi-même. Et c'est terrifiant."
 
-> *(petite pause rythmique, sourires autour de la table, puis le ton redevient grave)*
+> _(petite pause rythmique, sourires autour de la table, puis le ton redevient grave)_
 
 "Mais même le mystère est vulnérable dans ce monde."
 
@@ -26,7 +26,7 @@ Toi, tu es un mystère. Même à toi-même. Et c'est terrifiant."
 
 > "Ce n'est pas parce que votre histoire est belle qu'elle sera épargnée. Ici, même les mieux préparés peuvent tomber. Et parfois, les moins préparés tombent… en premier."
 
-> *(il regarde à nouveau la joueuse sans lore avec un clin d'œil)*
+> _(il regarde à nouveau la joueuse sans lore avec un clin d'œil)_
 
 "Mais qui sait ? Peut-être que ton histoire commencera justement… avec un cri."
 
@@ -44,7 +44,7 @@ Toi, tu es un mystère. Même à toi-même. Et c'est terrifiant."
 
 **Introduction de Session – "La Route vers Phandalin"**
 
-*(à lire à voix haute ou avec une musique d'ambiance lente et tendue)*
+_(à lire à voix haute ou avec une musique d'ambiance lente et tendue)_
 
 > Le vent souffle à travers les cimes, apportant avec lui les odeurs de sève, de mousse humide… et de sang séché.
 >
@@ -104,13 +104,13 @@ Toi, tu es un mystère. Même à toi-même. Et c'est terrifiant."
 
 ### La vision d'Élektra
 
-*(à lire en jeu ou paraphraser)*
+_(à lire en jeu ou paraphraser)_
 
 > "Tu te tiens dans l'auberge, mais le plancher disparaît sous tes pieds. Tu tombes, non dans le vide, mais dans une spirale de racines et de pierre, au fond de laquelle bat un cœur d'ombre. Des glyphes s'allument, vieux comme le monde, formant un cercle autour d'une trappe scellée."
 
 > "Une voix s'élève, ni homme, ni femme, ni bête :
 >
-> *'Sous le foyer, sous le vin, dans le silence du pin, le passé réclame son dû. Trois marches. Deux pas. Une clé de chair et d'éclat.'*"
+> _'Sous le foyer, sous le vin, dans le silence du pin, le passé réclame son dû. Trois marches. Deux pas. Une clé de chair et d'éclat.'_"
 
 > Puis tout disparaît dans une lueur verte, et l'ombre d'un bâton de verre flotte devant toi. Et tu te réveilles."
 
@@ -332,7 +332,7 @@ Le mage rouge s'effondra, consumé par sa propre arrogance.
 
 Le message disait :
 
-> *« Le prisonnier sera transféré au château des Kragmaw. Il connaît l'emplacement de la Mine. »*
+> _« Le prisonnier sera transféré au château des Kragmaw. Il connaît l'emplacement de la Mine. »_
 
 Sachant désormais que **Gundren Rockseeker** est en vie — et que sa carte vaut de l'or — vous avez pris la direction du château gobelin.
 
@@ -369,19 +369,19 @@ Vous savez désormais où il se rend : vers la **Grotte de l'Écho du Ressac**, 
 
 **"Le Fil Qui Se Rompt"**
 
-> *La poursuite dans la forêt reste gravée dans votre mémoire comme un rêve brisé.*
+> _La poursuite dans la forêt reste gravée dans votre mémoire comme un rêve brisé._
 >
-> *Le drow — ou ce que vous pensiez être un drow — courait entre les arbres, sa silhouette tremblant sous la lune décroissante.*
+> _Le drow — ou ce que vous pensiez être un drow — courait entre les arbres, sa silhouette tremblant sous la lune décroissante._
 >
-> *Par moments, il semblait se dédoubler, puis se déformer… jusqu'à évoquer le corps d'une immense araignée.*
+> _Par moments, il semblait se dédoubler, puis se déformer… jusqu'à évoquer le corps d'une immense araignée._
 >
-> ***L'Araignée Noire.***
+> **_L'Araignée Noire._**
 >
-> *Voilà ce que vous croyiez traquer ce soir-là.*
+> _Voilà ce que vous croyiez traquer ce soir-là._
 
 ---
 
-> *Mais rien ne s'est passé comme prévu.*
+> _Mais rien ne s'est passé comme prévu._
 >
 > Le faux drow a atteint un promontoire rocheux, s'est retourné vers Mar'Brak et, d'une voix sifflante, a murmuré :
 >
@@ -405,7 +405,7 @@ Vous savez désormais où il se rend : vers la **Grotte de l'Écho du Ressac**, 
 
 Au fond d'une faille, vous avez retrouvé Gundren, brisé mais vivant.
 
-*« L'Araignée… où est-elle ? »*
+_« L'Araignée… où est-elle ? »_
 
 Et, haletant, il vous a tout raconté :
 
@@ -434,7 +434,7 @@ Là, un souffle glacé vous a accueillis. Un grondement profond, répétitif… 
 
 > Elektra a senti un fil astral se tendre depuis l'entrée de la mine, se perdre dans les profondeurs, pulser comme une étoile mourante.
 >
-> *« Quelque chose… s'est réveillé là-dessous. »*
+> _« Quelque chose… s'est réveillé là-dessous. »_
 
 ---
 
