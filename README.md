@@ -5,6 +5,7 @@ Système de gestion de campagne D&D pour "Phandelver and Below: The Shattered Ob
 ## 📖 À propos
 
 Cette campagne D&D utilise Claude Code (extension VS Code) pour gérer de manière collaborative :
+
 - **Personnages** (joueurs, antagonistes, NPCs, membres de factions)
 - **Lieux** (Phandalin, Thundertree, Wave Echo Cave, etc.)
 - **Factions** et leurs relations
@@ -51,7 +52,7 @@ nvm use 24
 
 ✅ L'intégration Notion est déjà active avec des données exportées.
 
-📖 Voir le guide complet : [notion-import/docs/GUIDE-CONFIGURATION-NOTION.md](notion-import/docs/GUIDE-CONFIGURATION-NOTION.md)
+📖 Voir le guide complet : [notion-import/docs/GUIDE-CONFIGURATION-NOTION.md](docs/GUIDE-CONFIGURATION-NOTION.md)
 
 #### 2. Google Drive (nouveau !)
 
@@ -102,6 +103,7 @@ nvm use 24
 - **Autres** : Personnages secondaires
 
 Exemple de structure YAML :
+
 ```yaml
 ---
 nom: "Gundren Rockseeker"
@@ -155,6 +157,7 @@ Voir [.gitignore](.gitignore) pour la liste complète.
 ### Commits
 
 Suivez les conventions de commits :
+
 ```
 feat: add Google Drive integration
 docs: update configuration guides

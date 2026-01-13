@@ -1,0 +1,19 @@
+{
+  "name": "google-drive-integration",
+  "version": "1.0.0",
+  "description": "Ce répertoire contient la configuration et la documentation pour l'intégration Google Drive avec Claude Code.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@modelcontextprotocol/server-gdrive": "^2025.1.14"
+  }
+}

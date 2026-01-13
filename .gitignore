@@ -31,3 +31,6 @@ Thumbs.db
 # VS Code local settings
 .vscode/settings.json
 !.vscode/settings.json
+
+# Secrets
+.secrets/

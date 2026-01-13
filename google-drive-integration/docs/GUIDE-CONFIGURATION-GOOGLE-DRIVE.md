@@ -1,56 +1,115 @@
 # Guide de configuration Google Drive + Claude Code (VS Code Extension)
 
-Ce guide explique comment configurer l'accès Google Drive pour Claude Code sur Linux.
+Ce guide explique comment configurer l'accès Google Drive pour Claude Code sur Linux avec un Service Account.
+
+---
+
+## ⚠️ AVERTISSEMENT : Problèmes de compatibilité actuels (Janvier 2026)
+
+**STATUS** : Configuration partiellement fonctionnelle avec des limitations.
+
+Les packages MCP pour Google Drive ont actuellement des problèmes de compatibilité :
+
+- **`mcp-google-drive`** : Ne supporte pas correctement le JSON inline dans `GOOGLE_SERVICE_ACCOUNT_KEY`, essaie de lire la valeur comme un chemin de fichier au lieu du contenu JSON.
+- **`@mcp-z/mcp-drive`** : Requiert `GOOGLE_CLIENT_ID` même en mode `service-account`, ce qui empêche l'utilisation pure du Service Account.
+- **`@modelcontextprotocol/server-gdrive`** : Marqué comme DEPRECATED et n'est plus supporté.
+
+### Alternative recommandée : Notion
+
+Pour obtenir le contexte de votre campagne, **utilisez Notion** qui fonctionne parfaitement avec Claude Code :
+- Configuration simple et fiable
+- API stable et bien documentée
+- Intégration MCP complète et fonctionnelle
+
+Voir le [Guide de configuration Notion](../../docs/GUIDE-CONFIGURATION-NOTION.md) pour plus d'informations.
+
+### Si vous souhaitez quand même essayer Google Drive
+
+Vous pouvez suivre ce guide, mais attendez-vous à rencontrer des problèmes. La configuration décrite ci-dessous a été testée mais les outils MCP peuvent ne pas fonctionner correctement au runtime.
+
+---
+
+## Prérequis
+
+- Node.js 18+ installé
+- VS Code avec l'extension Claude Code
+- Un compte Google
 
 ---
 
 ## Étape 1 : Créer un projet Google Cloud et activer l'API
 
-1. Allez sur <https://console.cloud.google.com/>
-2. Créez un nouveau projet ou sélectionnez un projet existant
-3. Dans le menu, allez dans **"APIs & Services"** > **"Enabled APIs & services"**
-4. Cliquez sur **"+ ENABLE APIS AND SERVICES"**
-5. Recherchez **"Google Drive API"**
-6. Cliquez sur **"Google Drive API"** puis **"Enable"**
+1. Allez sur https://console.cloud.google.com/
+2. Créez un nouveau projet (ou sélectionnez un projet existant)
+   - Cliquez sur le sélecteur de projet en haut
+   - Cliquez sur **"NEW PROJECT"**
+   - Donnez un nom à votre projet (ex: "DonjonsAndDragons")
+   - Cliquez sur **"CREATE"**
+3. Sélectionnez votre projet
+4. Dans le menu de gauche, allez dans **"APIs & Services"** > **"Enabled APIs & services"**
+5. Cliquez sur **"+ ENABLE APIS AND SERVICES"**
+6. Recherchez **"Google Drive API"**
+7. Cliquez sur **"Google Drive API"** puis **"ENABLE"**
 
 ---
 
-## Étape 2 : Créer des credentials OAuth 2.0
+## Étape 2 : Créer un Service Account
 
-### Option A : Credentials OAuth 2.0 (recommandé pour accès complet)
+### Pourquoi un Service Account ?
 
-1. Dans **"APIs & Services"** > **"Credentials"**
-2. Cliquez sur **"+ CREATE CREDENTIALS"** > **"OAuth client ID"**
-3. Si demandé, configurez d'abord l'écran de consentement OAuth :
-   - Type : **External** (ou Internal si vous êtes dans Google Workspace)
-   - Remplissez les informations requises (nom de l'app, email de support)
-   - Scopes : Ajoutez les scopes Google Drive nécessaires :
-     - `https://www.googleapis.com/auth/drive.readonly` (lecture seule)
-     - `https://www.googleapis.com/auth/drive.file` (fichiers créés par l'app)
-     - `https://www.googleapis.com/auth/drive` (accès complet, si nécessaire)
-   - Test users : Ajoutez votre email si en mode External
-4. Retournez dans **"Credentials"** et créez l'OAuth client ID :
-   - Application type : **Desktop app** ou **Web application**
-   - Name : `Claude Code Google Drive`
-5. **Téléchargez le fichier JSON** des credentials
-6. **GARDEZ CE FICHIER SECRET** !
+Un Service Account est plus simple qu'OAuth car il ne nécessite pas d'ouvrir un navigateur à chaque authentification. Il suffit de partager vos fichiers Google Drive avec l'email du Service Account.
 
-### Option B : Service Account (pour automatisation)
+### Créer le Service Account
 
-1. Dans **"APIs & Services"** > **"Credentials"**
-2. Cliquez sur **"+ CREATE CREDENTIALS"** > **"Service account"**
-3. Remplissez les informations et créez
-4. Dans la liste des service accounts, cliquez sur le compte créé
-5. Allez dans l'onglet **"Keys"**
-6. Cliquez sur **"Add Key"** > **"Create new key"**
-7. Choisissez **JSON** et téléchargez
-8. **Partagez vos dossiers/fichiers Google Drive** avec l'email du service account
+1. Dans **"APIs & Services"** > **"IAM & Admin"** > **"Service Accounts"**
+2. Cliquez sur **"+ CREATE SERVICE ACCOUNT"**
+3. Remplissez :
+   - **Service account name** : `claude-code-drive` (ou un nom de votre choix)
+   - **Service account ID** : (sera rempli automatiquement)
+   - **Description** : `Service account for Claude Code to access Google Drive`
+4. Cliquez sur **"CREATE AND CONTINUE"**
+5. Sautez l'étape "Grant this service account access to project" (cliquez sur **"CONTINUE"**)
+6. Sautez l'étape "Grant users access" (cliquez sur **"DONE"**)
+
+### Créer une clé JSON
+
+1. Dans la liste des Service Accounts, trouvez celui que vous venez de créer
+2. Cliquez sur l'**email du service account** (toute la ligne)
+3. Allez dans l'onglet **"KEYS"** (en haut)
+4. Cliquez sur **"ADD KEY"** > **"Create new key"**
+5. Sélectionnez **"JSON"**
+6. Cliquez sur **"CREATE"**
+7. Un fichier JSON sera téléchargé automatiquement (ex: `donjonsanddragons-xxxxx.json`)
+
+**⚠️ GARDEZ CE FICHIER SECRET !** Ne le partagez jamais publiquement.
 
 ---
 
-## Étape 3 : Configurer Claude Code (MCP) sur Linux
+## Étape 3 : Placer le fichier Service Account dans le projet
 
-### ⚠️ IMPORTANT : Deux méthodes selon votre usage
+### Sur WSL (Windows Subsystem for Linux)
+
+Si vous utilisez WSL et que le fichier est dans vos téléchargements Windows :
+
+```bash
+# Copier depuis Windows vers WSL
+cp /mnt/c/Users/VOTRE_NOM_UTILISATEUR/Downloads/donjonsanddragons-xxxxx.json \
+   /chemin/vers/votre/projet/google-drive-integration/credentials/service-account.json
+```
+
+### Sur Linux natif
+
+```bash
+# Déplacer le fichier téléchargé
+mv ~/Downloads/donjonsanddragons-xxxxx.json \
+   /chemin/vers/votre/projet/google-drive-integration/credentials/service-account.json
+```
+
+---
+
+## Étape 4 : Configurer Claude Code (MCP)
+
+### ⚠️ IMPORTANT : Emplacement de la configuration
 
 | Usage                             | Fichier de config                             |
 | --------------------------------- | --------------------------------------------- |
@@ -59,21 +118,25 @@ Ce guide explique comment configurer l'accès Google Drive pour Claude Code sur 
 
 ---
 
-### Pour Claude Code VS Code Extension (recommandé)
+### Configuration pour VS Code Extension (recommandé)
 
-Il existe plusieurs serveurs MCP pour Google Drive. Voici les principales options :
-
-#### Option 1 : Serveur MCP officiel Google Drive
-
-1. **Créez ou ouvrez le fichier de configuration** :
+1. **Ouvrez le fichier de configuration** :
 
    ```bash
    code ~/.claude.json
    ```
 
-2. **Ajoutez la configuration MCP dans `mcpServers`** :
+2. **Trouvez ou créez la section `projects`** pour votre projet
 
-   Pour le projet actuel `/home/user/PhandelverAndBelow` :
+3. **Lisez le contenu du fichier service account** (sur une seule ligne) :
+
+   ```bash
+   cat /chemin/vers/service-account.json | tr -d '\n'
+   ```
+
+4. **Ajoutez la configuration MCP Google Drive dans `mcpServers`** :
+
+   **Exemple avec Google Drive seul** :
 
    ```json
    {
@@ -82,10 +145,9 @@ Il existe plusieurs serveurs MCP pour Google Drive. Voici les principales option
          "mcpServers": {
            "google-drive": {
              "command": "npx",
-             "args": ["-y", "@modelcontextprotocol/server-gdrive"],
+             "args": ["-y", "mcp-google-drive"],
              "env": {
-               "GOOGLE_DRIVE_CREDENTIALS_FILE": "/chemin/vers/votre/credentials.json",
-               "GOOGLE_DRIVE_TOKEN_FILE": "/home/user/.config/google-drive-mcp-token.json"
+               "GOOGLE_SERVICE_ACCOUNT_KEY": "{  \"type\": \"service_account\",  \"project_id\": \"votre-project-id\",  \"private_key_id\": \"...\",  \"private_key\": \"...\",  \"client_email\": \"votre-service-account@votre-project.iam.gserviceaccount.com\", ... }"
              }
            }
          }
@@ -94,7 +156,7 @@ Il existe plusieurs serveurs MCP pour Google Drive. Voici les principales option
    }
    ```
 
-   **OU** si vous avez aussi Notion configuré :
+   **Exemple avec Notion + Google Drive** :
 
    ```json
    {
@@ -110,10 +172,9 @@ Il existe plusieurs serveurs MCP pour Google Drive. Voici les principales option
            },
            "google-drive": {
              "command": "npx",
-             "args": ["-y", "@modelcontextprotocol/server-gdrive"],
+             "args": ["-y", "mcp-google-drive"],
              "env": {
-               "GOOGLE_DRIVE_CREDENTIALS_FILE": "/chemin/vers/votre/credentials.json",
-               "GOOGLE_DRIVE_TOKEN_FILE": "/home/user/.config/google-drive-mcp-token.json"
+               "GOOGLE_SERVICE_ACCOUNT_KEY": "{  \"type\": \"service_account\",  \"project_id\": \"votre-project-id\",  \"private_key_id\": \"...\",  \"private_key\": \"...\",  \"client_email\": \"votre-service-account@votre-project.iam.gserviceaccount.com\", ... }"
              }
            }
          }
@@ -122,65 +183,56 @@ Il existe plusieurs serveurs MCP pour Google Drive. Voici les principales option
    }
    ```
 
-3. **Remplacez `/chemin/vers/votre/credentials.json`** par le chemin vers votre fichier OAuth credentials téléchargé
+   **⚠️ IMPORTANT** :
+   - Remplacez `GOOGLE_SERVICE_ACCOUNT_KEY` par le contenu JSON complet (sur une seule ligne)
+   - Les `\n` dans la clé privée doivent être échappés en `\\n`
+   - Remplacez `/home/user/PhandelverAndBelow` par le chemin absolu vers votre projet
 
-4. **Sauvegardez le fichier** (`Ctrl+S`)
-
----
-
-### Pour Claude Desktop App (alternative)
-
-1. **Créez le répertoire si nécessaire** :
-
-   ```bash
-   mkdir -p ~/.config/claude
-   ```
-
-2. **Créez ou éditez le fichier** :
-
-   ```bash
-   code ~/.config/claude/claude_desktop_config.json
-   ```
-
-3. **Ajoutez cette configuration** :
-
-   ```json
-   {
-     "mcpServers": {
-       "google-drive": {
-         "command": "npx",
-         "args": ["-y", "@modelcontextprotocol/server-gdrive"],
-         "env": {
-           "GOOGLE_DRIVE_CREDENTIALS_FILE": "/chemin/vers/votre/credentials.json",
-           "GOOGLE_DRIVE_TOKEN_FILE": "/home/user/.config/google-drive-mcp-token.json"
-         }
-       }
-     }
-   }
-   ```
+5. **Sauvegardez le fichier** (`Ctrl+S`)
 
 ---
 
-## Étape 4 : Premier lancement et authentification OAuth
+## Étape 5 : Redémarrer VS Code
 
-1. **Fermez complètement VS Code**
+1. **Fermez complètement VS Code** (pas juste la fenêtre, fermez le processus entier)
 2. **Relancez VS Code** et ouvrez votre projet
-3. Au premier lancement, le serveur MCP Google Drive va :
-   - Détecter qu'il n'y a pas encore de token OAuth
-   - Ouvrir votre navigateur pour vous connecter à Google
-   - Demander l'autorisation d'accéder à Google Drive
-   - Sauvegarder le token dans `GOOGLE_DRIVE_TOKEN_FILE`
-4. **Autorisez l'accès** dans le navigateur
-5. Retournez dans VS Code - la connexion devrait être active !
+3. La connexion Google Drive devrait être active !
 
 ---
 
-## Étape 5 : Organiser vos fichiers de campagne
+## Étape 6 : Partager vos fichiers avec le Service Account
 
-Je recommande de créer une structure dans Google Drive pour votre campagne :
+Le Service Account a son propre Google Drive vide. Pour qu'il puisse accéder à **vos** fichiers Google Drive personnels, vous devez les partager avec lui.
+
+### Email du Service Account
+
+L'email est dans le fichier JSON téléchargé, dans le champ `client_email`. Il ressemble à :
+```
+votre-nom-service@votre-project-id.iam.gserviceaccount.com
+```
+
+### Comment partager vos fichiers
+
+1. Allez sur https://drive.google.com/
+2. Sélectionnez un dossier ou fichier que vous voulez partager
+3. Clic droit > **"Partager"** (ou bouton Partager)
+4. Entrez l'email du service account (ex: `claude-code-drive@donjonsanddragons.iam.gserviceaccount.com`)
+5. Définissez les permissions :
+   - **Lecteur** : Claude peut seulement lire les fichiers
+   - **Éditeur** : Claude peut modifier et créer des fichiers
+   - **Propriétaire** : Claude a un contrôle complet (déconseillé)
+6. Cliquez sur **"Envoyer"**
+
+💡 **Astuce** : Créez un dossier dédié pour votre campagne D&D et partagez-le avec le Service Account. Tous les sous-dossiers et fichiers seront automatiquement accessibles !
+
+---
+
+## Structure recommandée dans Google Drive
+
+Créez une structure organisée dans Google Drive pour votre campagne :
 
 ```
-📁 Phandelver Campaign/
+📁 Phandelver Campaign/ (partagé avec le Service Account)
 ├── 📁 Characters/
 │   ├── 📄 Joueurs.docx
 │   ├── 📄 NPCs.docx
@@ -201,16 +253,11 @@ Je recommande de créer une structure dans Google Drive pour votre campagne :
     └── 📄 Homebrew Items.docx
 ```
 
-Vous pouvez ensuite demander à Claude :
-- "Liste les fichiers dans mon dossier Phandelver Campaign"
-- "Lis le document Session 01 - Notes"
-- "Crée un nouveau document de session dans Sessions/"
-
 ---
 
 ## Vérification
 
-Une fois redémarré, demandez à Claude :
+Une fois VS Code redémarré et vos fichiers partagés, demandez à Claude :
 
 - "Liste mes fichiers Google Drive"
 - "Cherche dans mon Google Drive les fichiers sur Phandalin"
@@ -219,90 +266,151 @@ Une fois redémarré, demandez à Claude :
 
 ---
 
-## Troubleshooting
+## Problèmes connus (Janvier 2026)
 
-### Erreur "package not found" ou serveur MCP introuvable
+### Les outils Google Drive n'apparaissent pas
 
-Si `@modelcontextprotocol/server-gdrive` ne fonctionne pas, essayez une alternative :
+**Symptôme** : Après avoir configuré le serveur MCP Google Drive, aucun outil `mcp__google-drive__*` n'apparaît dans Claude Code.
 
-```bash
-# Vérifier les packages MCP Google Drive disponibles
-npm search mcp google drive
+**Cause** : Les packages MCP actuels ont des bugs de compatibilité :
+
+1. **`mcp-google-drive`** :
+   - Erreur : `Error: ENOENT: no such file or directory, open '/home/user/project/{...json...}'`
+   - Le package essaie de lire `GOOGLE_SERVICE_ACCOUNT_KEY` comme un chemin de fichier au lieu de parser le JSON
+   - **Pas de solution actuelle** - le package ne supporte pas le JSON inline correctement
+
+2. **`@mcp-z/mcp-drive`** :
+   - Erreur : `Error: Environment variable GOOGLE_CLIENT_ID is required for Google OAuth`
+   - Le package requiert `GOOGLE_CLIENT_ID` même en mode `--auth=service-account`
+   - **Solution temporaire** : Impossible d'utiliser en mode service-account pur
+
+### Recommandation : Utiliser Notion à la place
+
+La meilleure solution actuellement est d'utiliser Notion pour stocker le contexte de votre campagne :
+
+```json
+{
+  "projects": {
+    "/home/user/PhandelverAndBelow": {
+      "mcpServers": {
+        "notion": {
+          "command": "npx",
+          "args": ["-y", "@notionhq/notion-mcp-server"],
+          "env": {
+            "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer votre_token_notion\", \"Notion-Version\": \"2022-06-28\"}"
+          }
+        }
+      }
+    }
+  }
+}
 ```
 
-Alternatives possibles :
-- `@google-drive/mcp-server`
-- `mcp-server-google-drive`
+Voir le [Guide de configuration Notion](../../docs/GUIDE-CONFIGURATION-NOTION.md).
 
-### Erreur d'authentification OAuth
+---
 
-1. Vérifiez que le fichier `credentials.json` existe et est au bon chemin
-2. Supprimez le fichier token (`~/.config/google-drive-mcp-token.json`) et réessayez
-3. Vérifiez que vous avez ajouté votre email dans "Test users" si l'app est en mode External
-4. Vérifiez que l'API Google Drive est bien activée dans Google Cloud Console
+## Troubleshooting
+
+### Erreur "Authentication not ready"
+
+- Vérifiez que le fichier `service-account.json` existe et est au bon chemin
+- Vérifiez que le contenu JSON dans `GOOGLE_SERVICE_ACCOUNT_KEY` est correct
+- Redémarrez complètement VS Code
+
+### Package `mcp-google-drive` introuvable
+
+Le package existe et est publié sur npm. Si vous avez une erreur, vérifiez :
+
+```bash
+npm view mcp-google-drive
+```
+
+Si le package n'est pas accessible, essayez une alternative :
+- `@mcp-z/mcp-drive` (supporte OAuth et Service Account)
+
+### Les fichiers n'apparaissent pas
+
+Le Service Account n'a accès qu'aux fichiers/dossiers que vous avez **explicitement partagés** avec son email.
+
+**Solutions** :
+1. Vérifiez que vous avez bien partagé les fichiers/dossiers avec l'email du Service Account
+2. Attendez quelques minutes après le partage
+3. Redémarrez VS Code
 
 ### Node.js non installé
 
 Vérifiez que Node.js est installé :
 
 ```bash
-node --version  # Devrait afficher v24.x (selon .nvmrc)
+node --version  # Devrait afficher v18+
 npm --version
 ```
 
-Pour installer la bonne version avec nvm :
+Pour installer Node.js :
 
 ```bash
+# Avec nvm (recommandé)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+source ~/.bashrc
 nvm install 24
 nvm use 24
+
+# Ou avec apt (Ubuntu/Debian)
+sudo apt update
+sudo apt install nodejs npm
 ```
 
 ### Les outils MCP n'apparaissent pas
 
 1. Vérifiez que le fichier `~/.claude.json` est bien formaté (JSON valide)
-2. Assurez-vous que le chemin du projet est correct
-3. Redémarrez **complètement** VS Code (fermer le processus)
-4. Vérifiez les logs du serveur MCP dans la console de débogage VS Code
-
-### Accès refusé aux fichiers
-
-Si vous utilisez un **Service Account** :
-- Partagez explicitement chaque dossier/fichier avec l'email du service account
-- L'email est du type : `nom-service@projet-id.iam.gserviceaccount.com`
+2. Vérifiez que le chemin du projet est correct (absolu, pas relatif)
+3. Redémarrez **complètement** VS Code (fermez le processus)
+4. Vérifiez les logs : `View` > `Output` > sélectionnez "Claude Code"
 
 ---
 
 ## Sécurité
 
-⚠️ **Important** :
+⚠️ **TRÈS IMPORTANT** :
 
 - Ne commitez **JAMAIS** les fichiers suivants dans Git :
-  - `credentials.json` (OAuth ou Service Account credentials)
-  - Token files (`*-token.json`)
-  - `.claude.json` (contient les chemins vers les credentials)
+  - `service-account.json` (credentials du Service Account)
+  - `.claude.json` (contient les credentials en clair)
+
 - Ajoutez ces patterns à votre `.gitignore` :
-  ```
-  credentials.json
-  *-token.json
+
+  ```gitignore
+  # Google Drive credentials
+  google-drive-integration/credentials/*.json
+  !google-drive-integration/credentials/.gitkeep
+
+  # Claude configuration (contient des secrets)
   .claude.json
-  google-drive-integration/credentials/
   ```
-- Si des credentials sont compromis, révoquez-les immédiatement dans Google Cloud Console
+
+- Si les credentials sont compromis :
+  1. Allez sur https://console.cloud.google.com/
+  2. **"IAM & Admin"** > **"Service Accounts"**
+  3. Sélectionnez le Service Account
+  4. Allez dans **"Keys"** et supprimez la clé compromise
+  5. Créez une nouvelle clé
 
 ---
 
-## Structure recommandée du projet
+## Structure du projet recommandée
 
 ```
 PhandelverAndBelow/
-├── .gitignore (ajouter credentials et tokens)
+├── .gitignore (⚠️ doit inclure credentials/ et .claude.json)
+├── .claude.json (⚠️ NE PAS COMMITER - contient les secrets)
 ├── notion-import/ (données Notion)
 ├── google-drive-integration/
 │   ├── docs/
 │   │   └── GUIDE-CONFIGURATION-GOOGLE-DRIVE.md (ce fichier)
-│   └── credentials/ (à ajouter au .gitignore)
-│       ├── credentials.json (OAuth ou Service Account)
-│       └── .gitkeep
+│   └── credentials/ (⚠️ NE PAS COMMITER)
+│       ├── .gitkeep (committé pour créer le dossier)
+│       └── service-account.json (⚠️ NE PAS COMMITER)
 └── sessions/
 ```
 
@@ -310,7 +418,7 @@ PhandelverAndBelow/
 
 ## Synchro Notion ↔ Google Drive
 
-Une fois les deux intégrations configurées, vous pouvez :
+Une fois Notion et Google Drive configurés, vous pouvez :
 
 1. **Importer depuis Notion vers Google Drive** :
    - "Lis mes personnages depuis Notion et crée un Google Doc récapitulatif"
@@ -325,10 +433,10 @@ Une fois les deux intégrations configurées, vous pouvez :
 
 ## Références
 
+- [Package mcp-google-drive sur npm](https://www.npmjs.com/package/mcp-google-drive)
 - [Google Drive API Documentation](https://developers.google.com/drive/api/guides/about-sdk)
-- [OAuth 2.0 pour applications installées](https://developers.google.com/identity/protocols/oauth2/native-app)
+- [Service Accounts Overview](https://cloud.google.com/iam/docs/service-accounts)
 - [Model Context Protocol](https://modelcontextprotocol.io/)
-- [MCP Servers GitHub](https://github.com/modelcontextprotocol/servers)
 
 ---
 
@@ -336,11 +444,13 @@ Une fois les deux intégrations configurées, vous pouvez :
 
 Si vous rencontrez des problèmes :
 
-1. Vérifiez d'abord la section Troubleshooting ci-dessus
-2. Consultez les logs de VS Code (View > Output > sélectionnez "Claude Code")
+1. Vérifiez d'abord la section **Troubleshooting** ci-dessus
+2. Consultez les logs de VS Code : `View` > `Output` > sélectionnez "Claude Code"
 3. Vérifiez que toutes les étapes ont été suivies dans l'ordre
 4. Assurez-vous que les permissions sont correctes sur les fichiers credentials
 
 ---
 
-**Note** : Ce guide suppose l'utilisation du serveur MCP `@modelcontextprotocol/server-gdrive`. Si ce package n'existe pas encore ou n'est pas stable, vous devrez peut-être utiliser un serveur alternatif ou contribuer à créer un serveur MCP pour Google Drive.
+**Version du guide** : Mise à jour janvier 2026
+**Package utilisé** : `mcp-google-drive@1.6.2`
+**Méthode d'authentification** : Service Account (recommandé pour la simplicité)
