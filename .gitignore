@@ -1,0 +1,33 @@
+# Credentials et tokens secrets
+credentials.json
+*-token.json
+*.secret.json
+
+# Configuration locale Claude (contient les chemins vers credentials)
+.claude.json
+
+# Répertoires de credentials
+google-drive-integration/credentials/*
+!google-drive-integration/credentials/.gitkeep
+
+# Fichiers OneDrive (si utilisés)
+onedrive-integration/credentials/*
+!onedrive-integration/credentials/.gitkeep
+
+# Node modules (si nécessaire)
+node_modules/
+package-lock.json
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VS Code local settings
+.vscode/settings.json
+!.vscode/settings.json
