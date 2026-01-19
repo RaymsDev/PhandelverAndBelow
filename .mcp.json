@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "google-drive": {
+      "command": "/home/rayms/repos/PhandelverAndBelow/google-drive-integration/mcp-gdrive-wrapper.sh",
+      "args": []
+    }
+  }
+}
