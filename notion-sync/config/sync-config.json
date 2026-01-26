@@ -1,0 +1,24 @@
+{
+  "outputDir": "../notion-import",
+  "syncMode": "incremental",
+  "rootPages": [],
+  "pageTypeMapping": {
+    "Adventures": "adventures",
+    "Personnages": "personnages",
+    "Lieux": "lieux",
+    "Factions": "factions",
+    "Sessions": "sessions"
+  },
+  "frontmatterMapping": {
+    "Title": "nom",
+    "Race": "race",
+    "Type": "type",
+    "Role": "role",
+    "Faction": "faction",
+    "Location": "lieu",
+    "Gender": "gender"
+  },
+  "mediaStrategy": "url",
+  "recursive": true,
+  "verbose": false
+}

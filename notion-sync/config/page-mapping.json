@@ -1,0 +1,60 @@
+{
+  "mappingRules": [
+    {
+      "condition": {
+        "parent": "1dc3c30f-06bf-81c3-b6ea-d5987c47ca4d"
+      },
+      "output": "adventures",
+      "filenamePattern": "{title}"
+    },
+    {
+      "condition": {
+        "property": "Role",
+        "value": "PC"
+      },
+      "output": "personnages/joueurs",
+      "filenamePattern": "{title}"
+    },
+    {
+      "condition": {
+        "property": "Role",
+        "value": "NPC"
+      },
+      "output": "personnages/phandalin",
+      "filenamePattern": "{title}"
+    },
+    {
+      "condition": {
+        "property": "Role",
+        "value": "Villain"
+      },
+      "output": "personnages/antagonistes",
+      "filenamePattern": "{title}"
+    },
+    {
+      "condition": {
+        "property": "Type",
+        "value": "Town"
+      },
+      "output": "lieux",
+      "filenamePattern": "{title}"
+    },
+    {
+      "condition": {
+        "property": "Type",
+        "value": "Dungeon"
+      },
+      "output": "lieux",
+      "filenamePattern": "{title}"
+    },
+    {
+      "condition": {
+        "property": "Type",
+        "value": "Location"
+      },
+      "output": "lieux",
+      "filenamePattern": "{title}"
+    }
+  ],
+  "defaultOutput": "misc"
+}
