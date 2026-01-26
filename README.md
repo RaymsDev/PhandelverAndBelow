@@ -22,11 +22,17 @@ PhandelverAndBelow/
 │   ├── personnages/            # 32 personnages (joueurs, NPCs, antagonistes)
 │   ├── lieux/                  # 8 lieux de la campagne
 │   └── factions/               # Factions et organisations
+├── notion-sync/                # Synchronisation Notion → Markdown
+│   └── README.md               # Guide de synchronisation
 ├── google-drive-integration/   # Configuration Google Drive
 │   ├── docs/
 │   │   └── GUIDE-CONFIGURATION-GOOGLE-DRIVE.md
 │   ├── credentials/            # Credentials Google (non versionnés)
 │   └── .claude.json.example    # Exemple de configuration MCP
+├── chatgpt-assistant/          # Assistant ChatGPT pour préparer les sessions
+│   ├── README.md               # Documentation complète
+│   ├── QUICKSTART.md           # Guide de démarrage rapide
+│   └── EXAMPLES.md             # Exemples d'utilisation
 ├── sessions/                   # Notes et introductions de sessions
 ├── .gitignore                  # Exclut les credentials et tokens
 └── README.md                   # Ce fichier
