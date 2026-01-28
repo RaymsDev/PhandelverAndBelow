@@ -1,7 +1,11 @@
 {
   "mcpServers": {
     "google-drive": {
-      "command": "/home/rayms/repos/PhandelverAndBelow/google-drive-integration/mcp-gdrive-wrapper.sh",
+      "command": "/home/remy.laffuge/repos/PhandelverAndBelow/google-drive-integration/mcp-gdrive-wrapper.sh",
+      "args": []
+    },
+    "chatgpt": {
+      "command": "/home/remy.laffuge/repos/PhandelverAndBelow/chatgpt-mcp-server/mcp-chatgpt-wrapper.sh",
       "args": []
     }
   }

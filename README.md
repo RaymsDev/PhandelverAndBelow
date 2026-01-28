@@ -71,6 +71,24 @@ nvm use 24
 
 📖 Guide complet : [google-drive-integration/docs/GUIDE-CONFIGURATION-GOOGLE-DRIVE.md](google-drive-integration/docs/GUIDE-CONFIGURATION-GOOGLE-DRIVE.md)
 
+#### 3. ChatGPT Assistant (nouveau !)
+
+🆕 Deux façons d'utiliser ChatGPT pour préparer vos sessions :
+
+##### Option A : Serveur MCP (intégré à Claude)
+
+- Demandez à Claude d'utiliser ChatGPT comme outil
+- Configuré dans `.mcp.json`, actif automatiquement
+- 📖 Guide : [chatgpt-mcp-server/README.md](chatgpt-mcp-server/README.md)
+- 🚀 Démarrage rapide : [chatgpt-mcp-server/QUICKSTART.md](chatgpt-mcp-server/QUICKSTART.md)
+
+##### Option B : Assistant CLI (autonome)
+
+- Interface interactive en ligne de commande
+- Commandes directes pour préparer sessions, NPCs, encounters
+- 📖 Guide : [chatgpt-assistant/README.md](chatgpt-assistant/README.md)
+- 🚀 Démarrage rapide : [chatgpt-assistant/QUICKSTART.md](chatgpt-assistant/QUICKSTART.md)
+
 ## 🎮 Utilisation avec Claude Code
 
 ### Exemples de commandes Notion
@@ -97,6 +115,27 @@ nvm use 24
 "Exporte les personnages de Notion vers Google Drive"
 "Compare les infos de Phandalin entre Notion et Google Drive"
 "Crée un backup Google Drive de mes pages Notion"
+```
+
+### Exemples de commandes ChatGPT
+
+Via le serveur MCP (demandez à Claude):
+
+```
+"Use ChatGPT to prepare my next session at Cragmaw Castle"
+"Ask ChatGPT to create a mysterious merchant NPC"
+"Have ChatGPT design a level 3 encounter with goblins"
+"Use ChatGPT to explain the lore of Wave Echo Cave"
+```
+
+Ou via l'assistant CLI:
+
+```bash
+cd chatgpt-assistant
+npm start  # Mode interactif
+npm run prep "description de session"
+npm run npc "description PNJ"
+npm run encounter "description" --level 3
 ```
 
 ## 📊 Données de la campagne
@@ -192,11 +231,14 @@ git push -u origin claude/google-drive-integration-Slvzo
 
 - [Guide Notion](notion-import/docs/GUIDE-CONFIGURATION-NOTION.md)
 - [Guide Google Drive](google-drive-integration/docs/GUIDE-CONFIGURATION-GOOGLE-DRIVE.md)
+- [Guide ChatGPT MCP Server](chatgpt-mcp-server/README.md)
+- [Guide ChatGPT Assistant CLI](chatgpt-assistant/README.md)
 
 ### APIs et outils
 
 - [Notion API](https://developers.notion.com/)
 - [Google Drive API](https://developers.google.com/drive/api)
+- [OpenAI API (ChatGPT)](https://platform.openai.com/docs)
 - [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)
 - [Claude Code](https://docs.anthropic.com/claude/docs/claude-code)
 
