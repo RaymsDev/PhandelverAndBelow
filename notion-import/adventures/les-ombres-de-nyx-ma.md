@@ -58,12 +58,9 @@ Et quelque chose, dedans, **attend**.
 
 > Salle utilisée : La Forge aux Sortilèges, dans la Mine de l’Écho des Vagues.
 >
-> L’esprit de la panthère Nix’ma tente de se libérer de la corruption drow tout en résistant au plan astral fragmenté de la Forge.
->
+> L’esprit de la panthère Nyx’ma tente de se libérer de la corruption drow tout en résistant au plan astral fragmenté de la Forge.
 >
 > Chaque joueur doit accomplir **une action essentielle** pour stabiliser le rituel.
->
->
 
 ---
 
@@ -77,7 +74,7 @@ Mar’Brak doit déposer la statuette fissurée au centre du sceau.
 
 # 🧪 ÉPREUVE 1 : MAR’BRAK — _L’Appel du Sang_
 
-**But : ouvrir le lien avec Nix’ma sans être submergé par la corruption.**
+**But : ouvrir le lien avec Nyx’ma sans être submergé par la corruption.**
 
 **Jet : SAGESSE (Survie ou Intuition) DC 14**
 
@@ -90,8 +87,6 @@ Une ombre féline se dresse et murmure :
 > « Je te reconnais… marcheur des ombres. Continue. »
 >
 > → Mar’Brak gagne **avantage au jet final de communion**.
->
->
 
 **Échec :**
 
@@ -99,7 +94,7 @@ Une onde d’ombre le heurte.
 
 → Mar’Brak prend **1d6 dégâts nécrotiques**
 
-→ Le lien est instable : il fait le jet final **à désavantage**, sauf si un allié l’aide plus tard.
+→ désaventage au jet final
 
 # 🧪 ÉPREUVE 2 : ELEKTRA — _L’Alignement des Constellations_
 
@@ -181,9 +176,9 @@ Elles ciblent prioritairement Elektra et Rahzrik qui manipulent l’énergie.
 
 Combat court, 2 rounds maximum.
 
-# 🌕 PHASE 3 — JET FINAL : _La Communion avec Nix’ma_
+# 🌕 PHASE 3 — JET FINAL : _La Communion avec Nyx’ma_
 
-Lorsque les ombres sont dissipées, l’esprit de Nix’ma apparaît, immense, mi-ombre mi-lumière.
+Lorsque les ombres sont dissipées, l’esprit de Nyx’ma apparaît, immense, mi-ombre mi-lumière.
 
 **Jet : SAGESSE (Animal Handling ou Intuition) DC 16**
 
@@ -193,29 +188,27 @@ Lorsque les ombres sont dissipées, l’esprit de Nix’ma apparaît, immense, m
 
 **Si Mar’Brak réussit :**
 
-Nix’ma se dissipe en pluie d’étoiles et réapparaît à ses côtés.
+Nyx’ma se dissipe en pluie d’étoiles et réapparaît à ses côtés.
 
 > « Libre. Enfin. Et toi… tu ne seras plus seul. »
 >
-> → Il gagne la capacité **Invoquer Nix’ma**, une panthère astrale (Find Familiar amélioré).
->
->
+> → Il gagne la capacité **Invoquer Nyx’ma**, une panthère astrale (Find Familiar amélioré).
 
 **Si Mar’Brak échoue :**
 
-Nix’ma est libérée… mais sauvage.
+Nyx’ma est libérée… mais sauvage.
 
 Elle disparaît dans les ombres sans se lier.
 
 Elle réapparaîtra plus tard dans la campagne pour un _rituel de réconciliation_ plus difficile.
 
-# 🌕 **DESCRIPTION — SUCCÈS DE LA COMMUNION AVEC NIX’MA**
+# 🌕 **DESCRIPTION — SUCCÈS DE LA COMMUNION AVEC Nyx’MA**
 
 Le dernier écho du rituel s’évanouit dans la Forge.
 
 La lumière bleutée palpite une dernière fois… puis tout s’immobilise.
 
-Nix’ma apparaît alors pleinement.
+Nyx’ma apparaît alors pleinement.
 
 Non plus une ombre fuyante ni un cri déformé, mais une **panthère majestueuse**, faite de lumière lunaire et d’obscurité mouvante.
 
@@ -245,7 +238,7 @@ et l’artefact explose en une pluie de fragments d’obsidienne, qui se consume
 
 La lumière engloutit Mar’Brak.
 
-Nix’ma se dissout en volutes d’argent et d’ombre, qui viennent s’enrouler autour de son bras comme des serpents célestes.
+Nyx’ma se dissout en volutes d’argent et d’ombre, qui viennent s’enrouler autour de son bras comme des serpents célestes.
 
 La sensation brûle d’abord… puis apaise.
 
@@ -259,74 +252,14 @@ Une connexion.
 
 Vivante.
 
-Nix’ma réapparaît un instant derrière lui, immatérielle, un esprit libre mais lié à lui par choix, non par domination.
+Nyx’ma réapparaît un instant derrière lui, immatérielle, un esprit libre mais lié à lui par choix, non par domination.
 
 > Dans son esprit, une voix douce, profonde, presque ronronnée :
 >
 > **« Marcheur des ombres… je suis libre. Et toi, tu ne le seras plus jamais seul. »**
->
->
 
 La lumière s’éteint, les chaînes retombent, la Forge retrouve son silence.
 
 Mais Mar’Brak, lui…
 
 …porte désormais une étoile et une ombre dans la peau.
-
-# Secrets and Clues
-
-- Player secrets
-- Villain secrets
-- World secrets
-
-# NPCs
-
-- Name
-    - Physical description
-    - Voice or mannerism
-    - Motivation
-- Name
-    - Physical description
-    - Voice or mannerism
-    - Motivation
-- Name
-    - Physical description
-    - Voice or mannerism
-    - Motivation
-
-# Locations
-
-- Evocative name
-    - Sensory details
-    - One unique thing
-- Evocative name
-    - Sensory details
-    - One unique thing
-- Evocative name
-    - Sensory details
-    - One unique thing
-
-# Treasure
-
-- Magic items
-
-# Monsters
-
-- Monster
-    - Goal:
-    - HP:
-    - AC:
-    - Damage
-    - Unique move:
-
-# Check List
-
-- [ ] Review the characters
-- [ ] Strong start
-- [ ] 3+ NPCs
-- [ ] 1-3 fantastic locations
-- [ ] 1-3 unique treasures
-- [ ] 1-3 monsters
-- [ ] Reorganize notes to serve you
-- [ ] If time, choose maps, music, visual references
-- [ ] If time, make props
