@@ -1,33 +1,109 @@
 #!/usr/bin/env node
 
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
-import OpenAI from 'openai';
-import dotenv from 'dotenv';
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
+} from "@modelcontextprotocol/sdk/types.js";
+import dotenv from "dotenv";
+import fs from "fs/promises";
+import OpenAI from "openai";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load environment variables
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 // Initialize OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.CHATGPT_API_KEY,
 });
 
-const MODEL = process.env.CHATGPT_MODEL || 'gpt-4-turbo-preview';
-const CONTENT_DIR = path.resolve(__dirname, process.env.CONTENT_DIR || '../../notion-import');
+const MODEL = process.env.CHATGPT_MODEL || "gpt-4-turbo-preview";
+const CONTENT_DIR = path.resolve(
+  __dirname,
+  process.env.CONTENT_DIR || "../../notion-import",
+);
+const CHATS_DIR = path.resolve(__dirname, "../../chats");
 
 // Conversation history storage
 const conversations = new Map();
+
+/**
+ * Ensure chats directory exists
+ */
+async function ensureChatsDir() {
+  try {
+    await fs.mkdir(CHATS_DIR, { recursive: true });
+  } catch (error) {
+    console.error("Error creating chats directory:", error);
+  }
+}
+
+/**
+ * Save conversation to disk
+ */
+async function saveConversation(conversationId) {
+  if (!conversations.has(conversationId)) return;
+
+  try {
+    await ensureChatsDir();
+    const filePath = path.join(CHATS_DIR, `${conversationId}.json`);
+    const data = {
+      id: conversationId,
+      messages: conversations.get(conversationId),
+      lastUpdated: new Date().toISOString(),
+    };
+    await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+  } catch (error) {
+    console.error(`Error saving conversation ${conversationId}:`, error);
+  }
+}
+
+/**
+ * Load conversation from disk
+ */
+async function loadConversation(conversationId) {
+  try {
+    const filePath = path.join(CHATS_DIR, `${conversationId}.json`);
+    const content = await fs.readFile(filePath, "utf-8");
+    const data = JSON.parse(content);
+    conversations.set(conversationId, data.messages);
+    return data.messages;
+  } catch (error) {
+    // File doesn't exist or can't be read - return empty
+    return null;
+  }
+}
+
+/**
+ * Load all conversations from disk on startup
+ */
+async function loadAllConversations() {
+  try {
+    await ensureChatsDir();
+    const files = await fs.readdir(CHATS_DIR);
+    let loadedCount = 0;
+
+    for (const file of files) {
+      if (file.endsWith(".json")) {
+        const conversationId = file.replace(".json", "");
+        const messages = await loadConversation(conversationId);
+        if (messages) {
+          loadedCount++;
+        }
+      }
+    }
+
+    console.error(`Loaded ${loadedCount} conversation(s) from disk`);
+  } catch (error) {
+    console.error("Error loading conversations:", error);
+  }
+}
 
 /**
  * Load campaign context from markdown files
@@ -41,10 +117,10 @@ async function loadCampaignContext() {
     };
 
     // Load characters
-    const personnagesDir = path.join(CONTENT_DIR, 'personnages');
+    const personnagesDir = path.join(CONTENT_DIR, "personnages");
     const characterFiles = await findMarkdownFiles(personnagesDir);
     for (const file of characterFiles) {
-      const content = await fs.readFile(file, 'utf-8');
+      const content = await fs.readFile(file, "utf-8");
       const name = extractName(content);
       if (name) {
         context.characters.push(name);
@@ -52,10 +128,10 @@ async function loadCampaignContext() {
     }
 
     // Load locations
-    const lieuxDir = path.join(CONTENT_DIR, 'lieux');
+    const lieuxDir = path.join(CONTENT_DIR, "lieux");
     const locationFiles = await findMarkdownFiles(lieuxDir);
     for (const file of locationFiles) {
-      const content = await fs.readFile(file, 'utf-8');
+      const content = await fs.readFile(file, "utf-8");
       const name = extractName(content);
       if (name) {
         context.locations.push(name);
@@ -63,10 +139,10 @@ async function loadCampaignContext() {
     }
 
     // Load adventures
-    const adventuresDir = path.join(CONTENT_DIR, 'adventures');
+    const adventuresDir = path.join(CONTENT_DIR, "adventures");
     const adventureFiles = await findMarkdownFiles(adventuresDir);
     for (const file of adventureFiles) {
-      const content = await fs.readFile(file, 'utf-8');
+      const content = await fs.readFile(file, "utf-8");
       const name = extractName(content);
       if (name) {
         context.adventures.push(name);
@@ -75,7 +151,7 @@ async function loadCampaignContext() {
 
     return context;
   } catch (error) {
-    console.error('Error loading campaign context:', error);
+    console.error("Error loading campaign context:", error);
     return { characters: [], locations: [], adventures: [] };
   }
 }
@@ -90,8 +166,8 @@ async function findMarkdownFiles(dir) {
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
       if (entry.isDirectory()) {
-        files.push(...await findMarkdownFiles(fullPath));
-      } else if (entry.name.endsWith('.md')) {
+        files.push(...(await findMarkdownFiles(fullPath)));
+      } else if (entry.name.endsWith(".md")) {
         files.push(fullPath);
       }
     }
@@ -113,26 +189,26 @@ function extractName(content) {
  * Format campaign context for ChatGPT
  */
 function formatCampaignContext(context) {
-  let formatted = '\n\n# Campaign Context\n\n';
+  let formatted = "\n\n# Campaign Context\n\n";
 
   if (context.characters.length > 0) {
-    formatted += `**Characters**: ${context.characters.slice(0, 20).join(', ')}`;
+    formatted += `**Characters**: ${context.characters.slice(0, 20).join(", ")}`;
     if (context.characters.length > 20) {
       formatted += `, and ${context.characters.length - 20} more`;
     }
-    formatted += '\n\n';
+    formatted += "\n\n";
   }
 
   if (context.locations.length > 0) {
-    formatted += `**Locations**: ${context.locations.join(', ')}\n\n`;
+    formatted += `**Locations**: ${context.locations.join(", ")}\n\n`;
   }
 
   if (context.adventures.length > 0) {
-    formatted += `**Adventures**: ${context.adventures.slice(0, 10).join(', ')}`;
+    formatted += `**Adventures**: ${context.adventures.slice(0, 10).join(", ")}`;
     if (context.adventures.length > 10) {
       formatted += `, and ${context.adventures.length - 10} more`;
     }
-    formatted += '\n\n';
+    formatted += "\n\n";
   }
 
   return formatted;
@@ -146,7 +222,7 @@ async function callChatGPT(prompt, systemPrompt, conversationId = null) {
 
   // Add system prompt
   messages.push({
-    role: 'system',
+    role: "system",
     content: systemPrompt,
   });
 
@@ -157,7 +233,7 @@ async function callChatGPT(prompt, systemPrompt, conversationId = null) {
 
   // Add user message
   messages.push({
-    role: 'user',
+    role: "user",
     content: prompt,
   });
 
@@ -173,12 +249,20 @@ async function callChatGPT(prompt, systemPrompt, conversationId = null) {
   // Store conversation history
   if (conversationId) {
     if (!conversations.has(conversationId)) {
-      conversations.set(conversationId, []);
+      // Try to load from disk first
+      await loadConversation(conversationId);
+      if (!conversations.has(conversationId)) {
+        conversations.set(conversationId, []);
+      }
     }
-    conversations.get(conversationId).push(
-      { role: 'user', content: prompt },
-      { role: 'assistant', content: assistantMessage }
-    );
+    conversations
+      .get(conversationId)
+      .push(
+        { role: "user", content: prompt },
+        { role: "assistant", content: assistantMessage },
+      );
+    // Save to disk after each message
+    await saveConversation(conversationId);
   }
 
   return {
@@ -194,131 +278,142 @@ async function callChatGPT(prompt, systemPrompt, conversationId = null) {
 // Create MCP server
 const server = new Server(
   {
-    name: 'chatgpt-dnd-assistant',
-    version: '1.0.0',
+    name: "chatgpt-dnd-assistant",
+    version: "1.0.0",
   },
   {
     capabilities: {
       tools: {},
     },
-  }
+  },
 );
 
-// Load campaign context at startup
+// Load campaign context and conversations at startup
 const campaignContext = await loadCampaignContext();
 const campaignContextStr = formatCampaignContext(campaignContext);
+await loadAllConversations();
 
 // List available tools
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
-        name: 'chatgpt_prepare_session',
-        description: 'Use ChatGPT to prepare a D&D session with detailed plans, encounters, and plot hooks',
+        name: "chatgpt_prepare_session",
+        description:
+          "Use ChatGPT to prepare a D&D session with detailed plans, encounters, and plot hooks",
         inputSchema: {
-          type: 'object',
+          type: "object",
           properties: {
             session_description: {
-              type: 'string',
-              description: 'Description of the session to prepare (goals, location, party level, etc.)',
+              type: "string",
+              description:
+                "Description of the session to prepare (goals, location, party level, etc.)",
             },
             conversation_id: {
-              type: 'string',
-              description: 'Optional conversation ID to maintain context across multiple calls',
+              type: "string",
+              description:
+                "Optional conversation ID to maintain context across multiple calls",
             },
           },
-          required: ['session_description'],
+          required: ["session_description"],
         },
       },
       {
-        name: 'chatgpt_generate_npc',
-        description: 'Use ChatGPT to generate a detailed NPC with personality, motivations, and secrets',
+        name: "chatgpt_generate_npc",
+        description:
+          "Use ChatGPT to generate a detailed NPC with personality, motivations, and secrets",
         inputSchema: {
-          type: 'object',
+          type: "object",
           properties: {
             npc_description: {
-              type: 'string',
-              description: 'Description of the NPC to generate (role, location, personality hints)',
+              type: "string",
+              description:
+                "Description of the NPC to generate (role, location, personality hints)",
             },
             conversation_id: {
-              type: 'string',
-              description: 'Optional conversation ID to maintain context',
+              type: "string",
+              description: "Optional conversation ID to maintain context",
             },
           },
-          required: ['npc_description'],
+          required: ["npc_description"],
         },
       },
       {
-        name: 'chatgpt_create_encounter',
-        description: 'Use ChatGPT to design a balanced combat or challenge encounter',
+        name: "chatgpt_create_encounter",
+        description:
+          "Use ChatGPT to design a balanced combat or challenge encounter",
         inputSchema: {
-          type: 'object',
+          type: "object",
           properties: {
             encounter_description: {
-              type: 'string',
-              description: 'Description of the encounter (enemies, location, challenges)',
+              type: "string",
+              description:
+                "Description of the encounter (enemies, location, challenges)",
             },
             party_level: {
-              type: 'number',
-              description: 'Party level (1-20)',
+              type: "number",
+              description: "Party level (1-20)",
               default: 3,
             },
             conversation_id: {
-              type: 'string',
-              description: 'Optional conversation ID to maintain context',
+              type: "string",
+              description: "Optional conversation ID to maintain context",
             },
           },
-          required: ['encounter_description'],
+          required: ["encounter_description"],
         },
       },
       {
-        name: 'chatgpt_get_lore',
-        description: 'Use ChatGPT to get D&D lore, world-building details, or answer setting questions',
+        name: "chatgpt_get_lore",
+        description:
+          "Use ChatGPT to get D&D lore, world-building details, or answer setting questions",
         inputSchema: {
-          type: 'object',
+          type: "object",
           properties: {
             question: {
-              type: 'string',
-              description: 'Lore question or world-building request',
+              type: "string",
+              description: "Lore question or world-building request",
             },
             conversation_id: {
-              type: 'string',
-              description: 'Optional conversation ID to maintain context',
+              type: "string",
+              description: "Optional conversation ID to maintain context",
             },
           },
-          required: ['question'],
+          required: ["question"],
         },
       },
       {
-        name: 'chatgpt_chat',
-        description: 'General purpose chat with ChatGPT about D&D campaign planning and DMing',
+        name: "chatgpt_chat",
+        description:
+          "General purpose chat with ChatGPT about D&D campaign planning and DMing",
         inputSchema: {
-          type: 'object',
+          type: "object",
           properties: {
             message: {
-              type: 'string',
-              description: 'Your message or question to ChatGPT',
+              type: "string",
+              description: "Your message or question to ChatGPT",
             },
             conversation_id: {
-              type: 'string',
-              description: 'Optional conversation ID to maintain context across messages',
+              type: "string",
+              description:
+                "Optional conversation ID to maintain context across messages",
             },
           },
-          required: ['message'],
+          required: ["message"],
         },
       },
       {
-        name: 'chatgpt_clear_conversation',
-        description: 'Clear conversation history for a given conversation ID',
+        name: "chatgpt_clear_conversation",
+        description: "Clear conversation history for a given conversation ID",
         inputSchema: {
-          type: 'object',
+          type: "object",
           properties: {
             conversation_id: {
-              type: 'string',
-              description: 'Conversation ID to clear',
+              type: "string",
+              description: "Conversation ID to clear",
             },
           },
-          required: ['conversation_id'],
+          required: ["conversation_id"],
         },
       },
     ],
@@ -331,7 +426,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   try {
     switch (name) {
-      case 'chatgpt_prepare_session': {
+      case "chatgpt_prepare_session": {
         const systemPrompt = `You are a D&D session preparation assistant for "Phandelver and Below: The Shattered Obelisk". Help the DM create a detailed session plan including:
 - Session objectives and goals
 - Key scenes and encounters
@@ -345,20 +440,20 @@ Format your response in clear, organized markdown.${campaignContextStr}`;
         const result = await callChatGPT(
           args.session_description,
           systemPrompt,
-          args.conversation_id
+          args.conversation_id,
         );
 
         return {
           content: [
             {
-              type: 'text',
+              type: "text",
               text: result.response,
             },
           ],
         };
       }
 
-      case 'chatgpt_generate_npc': {
+      case "chatgpt_generate_npc": {
         const systemPrompt = `You are an NPC generator for D&D. Create detailed NPCs with:
 - Name and basic description
 - Personality traits and quirks
@@ -372,20 +467,20 @@ Make NPCs memorable and engaging for players.${campaignContextStr}`;
         const result = await callChatGPT(
           `Create an NPC: ${args.npc_description}`,
           systemPrompt,
-          args.conversation_id
+          args.conversation_id,
         );
 
         return {
           content: [
             {
-              type: 'text',
+              type: "text",
               text: result.response,
             },
           ],
         };
       }
 
-      case 'chatgpt_create_encounter': {
+      case "chatgpt_create_encounter": {
         const partyLevel = args.party_level || 3;
         const systemPrompt = `You are a D&D encounter designer. Create balanced encounters with:
 - Enemy composition and tactics
@@ -400,20 +495,20 @@ Ensure encounters are challenging but fair for party level ${partyLevel}.${campa
         const result = await callChatGPT(
           `Create a level ${partyLevel} encounter: ${args.encounter_description}`,
           systemPrompt,
-          args.conversation_id
+          args.conversation_id,
         );
 
         return {
           content: [
             {
-              type: 'text',
+              type: "text",
               text: result.response,
             },
           ],
         };
       }
 
-      case 'chatgpt_get_lore': {
+      case "chatgpt_get_lore": {
         const systemPrompt = `You are a D&D lore keeper and world-builder for "Phandelver and Below". Provide:
 - Detailed lore consistent with D&D canon
 - Creative world-building ideas
@@ -425,20 +520,20 @@ Keep answers engaging and usable at the table.${campaignContextStr}`;
         const result = await callChatGPT(
           args.question,
           systemPrompt,
-          args.conversation_id
+          args.conversation_id,
         );
 
         return {
           content: [
             {
-              type: 'text',
+              type: "text",
               text: result.response,
             },
           ],
         };
       }
 
-      case 'chatgpt_chat': {
+      case "chatgpt_chat": {
         const systemPrompt = `You are an expert Dungeon Master assistant for D&D 5th Edition, specifically for "Phandelver and Below: The Shattered Obelisk" campaign.
 
 Help with:
@@ -454,40 +549,48 @@ Always keep responses practical and actionable.${campaignContextStr}`;
         const result = await callChatGPT(
           args.message,
           systemPrompt,
-          args.conversation_id
+          args.conversation_id,
         );
 
         return {
           content: [
             {
-              type: 'text',
+              type: "text",
               text: result.response,
             },
           ],
         };
       }
 
-      case 'chatgpt_clear_conversation': {
-        if (conversations.has(args.conversation_id)) {
-          conversations.delete(args.conversation_id);
-          return {
-            content: [
-              {
-                type: 'text',
-                text: `Conversation history cleared for ID: ${args.conversation_id}`,
-              },
-            ],
-          };
-        } else {
-          return {
-            content: [
-              {
-                type: 'text',
-                text: `No conversation found with ID: ${args.conversation_id}`,
-              },
-            ],
-          };
+      case "chatgpt_clear_conversation": {
+        const conversationId = args.conversation_id;
+        let cleared = false;
+
+        // Remove from memory
+        if (conversations.has(conversationId)) {
+          conversations.delete(conversationId);
+          cleared = true;
         }
+
+        // Remove from disk
+        try {
+          const filePath = path.join(CHATS_DIR, `${conversationId}.json`);
+          await fs.unlink(filePath);
+          cleared = true;
+        } catch (error) {
+          // File doesn't exist, that's ok
+        }
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: cleared
+                ? `Conversation history cleared for ID: ${conversationId}`
+                : `No conversation found with ID: ${conversationId}`,
+            },
+          ],
+        };
       }
 
       default:
@@ -497,7 +600,7 @@ Always keep responses practical and actionable.${campaignContextStr}`;
     return {
       content: [
         {
-          type: 'text',
+          type: "text",
           text: `Error: ${error.message}`,
         },
       ],
@@ -510,10 +613,10 @@ Always keep responses practical and actionable.${campaignContextStr}`;
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error('ChatGPT MCP Server running on stdio');
+  console.error("ChatGPT MCP Server running on stdio");
 }
 
 main().catch((error) => {
-  console.error('Fatal error:', error);
+  console.error("Fatal error:", error);
   process.exit(1);
 });
